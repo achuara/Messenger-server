@@ -2,8 +2,11 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 
-import {Server} from 'socket.io';
-import http from 'http';
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+//import {Server} from 'socket.io';
+//import http from 'http';
 import cors from 'cors';
 
 import userRoutes from './routes/users.js';
@@ -18,10 +21,34 @@ app.use(bodyParser.json({ limit: '30mb', extended: true }))
 app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }))
 app.use(cors());
 
-const server = http.createServer(app);
+/*const server = http.createServer(app);
 const io = new Server(8080, {
   cors: {
+    origin: "http://localhost:3000",
+  },
+});*/
+
+const CONNECTION_URL = "mongodb+srv://sumankumar21041999:social123@cluster1.vigicqk.mongodb.net/?retryWrites=true&w=majority";
+const PORT = process.env.PORT|| 5000;
+
+
+mongoose.connect(CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+
+ // .then(() => server.listen(PORT, () => console.log(`Server Running on Port: http://localhost:${PORT}`)))
+  //.catch((error) => console.log(`${error} did not connect to database`));
+
+mongoose.set('useFindAndModify', false);
+
+const server = app.listen(
+  PORT,
+  console.log(`Server running on PORT ${PORT}...`)
+);
+
+const io = require("socket.io")(server, {
+  pingTimeout: 60000,
+  cors: {
     origin: "https://indianmessenger.vercel.app",
+    // credentials: true,
   },
 });
 
@@ -113,15 +140,7 @@ app.get('/user/online/:userId', (req, res) => {
 });
 
 
-const CONNECTION_URL = "mongodb+srv://sumankumar21041999:social123@cluster1.vigicqk.mongodb.net/?retryWrites=true&w=majority";
-const PORT = process.env.PORT|| 5000;
 
-
-mongoose.connect(CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => server.listen(PORT, () => console.log(`Server Running on Port: http://localhost:${PORT}`)))
-  .catch((error) => console.log(`${error} did not connect to database`));
-
-mongoose.set('useFindAndModify', false);
 
 
 
