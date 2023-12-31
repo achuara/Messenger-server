@@ -28,7 +28,8 @@ export const getConversation = async (req, res) => {
       const getConversation = await Conversation.find({
         members: { $in: [req.params.userId] },
       });
-              //console.log(getConversation);
+              console.log("getConversation");
+              console.log(getConversation);
       res.status(200).json(getConversation);
   } catch (error) {
       res.status(500).json({ message: error.message });
